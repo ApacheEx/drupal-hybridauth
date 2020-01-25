@@ -80,48 +80,48 @@ class HybridauthAdminSettings extends ConfigFormBase {
 
     $form['vtabs'] = [
       '#type' => 'vertical_tabs',
-      '#title' => t('Hybrid Auth Settings'),
+      '#title' => $this->t('Hybrid Auth Settings'),
     ];
     $form['fset_fields'] = [
       '#type' => 'details',
-      '#title' => t('Required information'),
+      '#title' => $this->t('Required information'),
       '#group' => 'vtabs',
     ];
     $form['fset_fields']['hybridauth_required_fields'] = [
       '#type' => 'checkboxes',
-      '#title' => t('Required information'),
+      '#title' => $this->t('Required information'),
       '#options' => [
-        'email' => t('Email address'),
-        'firstName' => t('First name'),
-        'lastName' => t('Last name'),
-        'gender' => t('Gender'),
+        'email' => $this->t('Email address'),
+        'firstName' => $this->t('First name'),
+        'lastName' => $this->t('Last name'),
+        'gender' => $this->t('Gender'),
       ],
-      '#description' => t("If authentication provider doesn't return it, visitor will need to fill additional form before registration."),
+      '#description' => $this->t("If authentication provider doesn't return it, visitor will need to fill additional form before registration."),
       '#default_value' => $values['hybridauth_required_fields'],
     ];
 
     // Account settings.
     $form['fset_account'] = [
       '#type' => 'details',
-      '#title' => t('Account settings'),
+      '#title' => $this->t('Account settings'),
       '#group' => 'vtabs',
     ];
     $form['fset_account']['hybridauth_register'] = [
       '#type' => 'radios',
-      '#title' => t('Who can register accounts?'),
+      '#title' => $this->t('Who can register accounts?'),
       '#options' => [
-        1 => t('Visitors'),
-        2 => t('Visitors, but administrator approval is required'),
-        3 => t('Nobody, only login for existing accounts is possible'),
+        1 => $this->t('Visitors'),
+        2 => $this->t('Visitors, but administrator approval is required'),
+        3 => $this->t('Nobody, only login for existing accounts is possible'),
       ],
       '#default_value' => $values['hybridauth_register'],
     ];
     $form['fset_account']['hybridauth_email_verification'] = [
       '#type' => 'radios',
-      '#title' => t('E-mail verification'),
+      '#title' => $this->t('E-mail verification'),
       '#options' => [
-        1 => t('Require e-mail verification'),
-        2 => t("Don't require e-mail verification"),
+        1 => $this->t('Require e-mail verification'),
+        2 => $this->t("Don't require e-mail verification"),
       ],
       '#default_value' => $values['hybridauth_email_verification'],
     ];
@@ -129,7 +129,7 @@ class HybridauthAdminSettings extends ConfigFormBase {
     // E-mail address verification template.
     $form['fset_account']['fset_email_verification_template'] = [
       '#type' => 'fieldset',
-      '#title' => t('E-mail verification template'),
+      '#title' => $this->t('E-mail verification template'),
       '#collapsible' => TRUE,
       '#collapsed' => TRUE,
       '#states' => [
@@ -142,13 +142,13 @@ class HybridauthAdminSettings extends ConfigFormBase {
     ];
     $form['fset_account']['fset_email_verification_template']['hybridauth_email_verification_subject'] = [
       '#type' => 'textfield',
-      '#title' => t('Subject'),
+      '#title' => $this->t('Subject'),
       '#default_value' => $values['hybridauth_email_verification_subject'],
       '#maxlength' => 180,
     ];
     $form['fset_account']['fset_email_verification_template']['hybridauth_email_verification_body'] = [
       '#type' => 'textarea',
-      '#title' => t('Body'),
+      '#title' => $this->t('Body'),
       '#default_value' => $values['hybridauth_email_verification_body'],
       '#rows' => 12,
     ];
@@ -165,26 +165,26 @@ class HybridauthAdminSettings extends ConfigFormBase {
     }
     $form['fset_account']['hybridauth_pictures'] = [
       '#type' => 'checkbox',
-      '#title' => t('Save HybridAuth provided picture as user picture'),
-      '#description' => t('Save pictures provided by HybridAuth as user pictures. Check the "Enable user pictures" option at <a href="@link">Account settings</a> to make this option available.',
+      '#title' => $this->t('Save HybridAuth provided picture as user picture'),
+      '#description' => $this->t('Save pictures provided by HybridAuth as user pictures. Check the "Enable user pictures" option at <a href="@link">Account settings</a> to make this option available.',
         ['@link' => '/admin/config/people/accounts']),
       '#default_value' => $values['hybridauth_pictures'],
     ];
     $form['fset_account']['hybridauth_username'] = [
       '#type' => 'textfield',
-      '#title' => t('Username pattern'),
+      '#title' => $this->t('Username pattern'),
       '#default_value' => $values['hybridauth_username'],
       '#required' => TRUE,
     ];
     $form['fset_account']['hybridauth_display_name'] = [
       '#type' => 'textfield',
-      '#title' => t('Display name pattern'),
+      '#title' => $this->t('Display name pattern'),
       '#default_value' => $values['hybridauth_display_name'],
     ];
     if ($module_exist_token) {
       $form['fset_account']['fset_token'] = [
         '#type' => 'fieldset',
-        '#title' => t('Tokens'),
+        '#title' => $this->t('Tokens'),
         '#collapsible' => TRUE,
         '#collapsed' => TRUE,
       ];
@@ -199,55 +199,55 @@ class HybridauthAdminSettings extends ConfigFormBase {
     }
     $form['fset_account']['hybridauth_registration_username_change'] = [
       '#type' => 'checkbox',
-      '#title' => t('Allow username change when registering'),
-      '#description' => t('Allow users to change their username when registering through HybridAuth.'),
+      '#title' => $this->t('Allow username change when registering'),
+      '#description' => $this->t('Allow users to change their username when registering through HybridAuth.'),
       '#default_value' => $values['hybridauth_registration_username_change'],
     ];
     $form['fset_account']['hybridauth_registration_password'] = [
       '#type' => 'checkbox',
-      '#title' => t('Ask user for a password when registering'),
-      '#description' => t('Ask users to set password for account when registering through HybridAuth.'),
+      '#title' => $this->t('Ask user for a password when registering'),
+      '#description' => $this->t('Ask users to set password for account when registering through HybridAuth.'),
       '#default_value' => $values['hybridauth_registration_password'],
     ];
     $form['fset_account']['hybridauth_override_realname'] = [
       '#type' => 'checkbox',
-      '#title' => t('Override Real name'),
+      '#title' => $this->t('Override Real name'),
       '#default_value' => $values['hybridauth_override_realname'],
       '#disabled' => !$this->moduleHandler->moduleExists('realname'),
     ];
     $form['fset_account']['hybridauth_disable_username_change'] = [
       '#type' => 'checkbox',
-      '#title' => t('Disable username change'),
-      '#description' => t('Remove username field from user account edit form for users created by HybridAuth. If this is unchecked then users should also have "Change own username" permission to actually be able to change the username.'),
+      '#title' => $this->t('Disable username change'),
+      '#description' => $this->t('Remove username field from user account edit form for users created by HybridAuth. If this is unchecked then users should also have "Change own username" permission to actually be able to change the username.'),
       '#default_value' => $values['hybridauth_disable_username_change'],
     ];
     $form['fset_account']['hybridauth_remove_password_fields'] = [
       '#type' => 'checkbox',
-      '#title' => t('Remove password fields'),
-      '#description' => t('Remove password fields from user account edit form for users created by HybridAuth.'),
+      '#title' => $this->t('Remove password fields'),
+      '#description' => $this->t('Remove password fields from user account edit form for users created by HybridAuth.'),
       '#default_value' => $values['hybridauth_disable_username_change'],
     ];
 
     // Other settings.
     $form['fset_other'] = [
       '#type' => 'details',
-      '#title' => t('Other settings'),
+      '#title' => $this->t('Other settings'),
       '#group' => 'vtabs',
     ];
     $form['fset_other']['hybridauth_destination'] = [
       '#type' => 'textfield',
-      '#title' => t('Redirect after login'),
+      '#title' => $this->t('Redirect after login'),
       '#default_value' => $values['hybridauth_destination'],
     ];
     $form['fset_other']['hybridauth_destination_error'] = [
       '#type' => 'textfield',
-      '#title' => t('Redirect after error on login'),
+      '#title' => $this->t('Redirect after error on login'),
       '#default_value' => $values['hybridauth_destination_error'],
     ];
     if ($module_exist_token) {
       $form['fset_other']['fset_token'] = [
         '#type' => 'fieldset',
-        '#title' => t('Tokens'),
+        '#title' => $this->t('Tokens'),
         '#collapsible' => TRUE,
         '#collapsed' => TRUE,
       ];
@@ -261,24 +261,24 @@ class HybridauthAdminSettings extends ConfigFormBase {
       ];
     }
     $options = [
-      0 => t('Allow duplicate email addresses, create new user account and login'),
-      1 => t("Don't allow duplicate email addresses, block registration and advise to login using the existing account"),
-      2 => t("Don't allow duplicate email addresses, add new identity to the existing account and login"),
+      0 => $this->t('Allow duplicate email addresses, create new user account and login'),
+      1 => $this->t("Don't allow duplicate email addresses, block registration and advise to login using the existing account"),
+      2 => $this->t("Don't allow duplicate email addresses, add new identity to the existing account and login"),
     ];
     $form['fset_other']['hybridauth_duplicate_emails'] = [
       '#type' => 'radios',
-      '#title' => t('Duplicate emails'),
+      '#title' => $this->t('Duplicate emails'),
       '#options' => $options,
       '#default_value' => $values['hybridauth_duplicate_emails'],
     ];
     $form['fset_other']['hybridauth_proxy'] = [
       '#type' => 'textfield',
-      '#title' => t('Proxy'),
+      '#title' => $this->t('Proxy'),
       '#default_value' => $values['hybridauth_proxy'],
     ];
     $form['fset_other']['hybridauth_debug'] = [
       '#type' => 'checkbox',
-      '#title' => t('Debug mode'),
+      '#title' => $this->t('Debug mode'),
       '#default_value' => $values['hybridauth_debug'],
     ];
 
