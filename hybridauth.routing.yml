@@ -1,0 +1,6 @@
+hybridauth.callback:
+  path: /hybridauth/callback
+  defaults:
+    _controller: '\Drupal\hybridauth\Controller\CallbackController::callback'
+  requirements:
+    _permission: 'use hybridauth'

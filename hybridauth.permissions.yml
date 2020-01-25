@@ -1,0 +1,4 @@
+use hybridauth:
+  title: 'Use HybridAuth'
+  description: 'Login through HybridAuth.'
+  restrict access: true
