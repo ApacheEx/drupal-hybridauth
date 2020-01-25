@@ -1,0 +1,6 @@
+name: HybridAuth
+description: Provides HybridAuth social sign-on.
+package: HybridAuth
+
+type: module
+core: 8.x

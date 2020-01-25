@@ -1,0 +1,7 @@
+{
+  "name": "drupal/hybridauth_library",
+  "type": "drupal-module",
+  "require" : {
+    "hybridauth/hybridauth" : "^3.1"
+  }
+}
