@@ -1,6 +1,7 @@
 {
   "name": "drupal/hybridauth_library",
   "type": "drupal-module",
+  "minimum-stability": "dev",
   "require" : {
     "hybridauth/hybridauth" : "^3.1"
   }
