@@ -21,7 +21,7 @@ class HybridauthAdminSettings extends ConfigFormBase {
   protected $moduleHandler;
 
   /**
-   * Constructs a new XmlSitemapCustomAddForm object.
+   * Constructs a new HybridauthAdminSettings object.
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The factory for configuration objects.
@@ -152,8 +152,8 @@ class HybridauthAdminSettings extends ConfigFormBase {
       '#default_value' => $values['hybridauth_email_verification_body'],
       '#rows' => 12,
     ];
-    $module_exist_token = $this->moduleHandler->moduleExists('token');
-    if ($module_exist_token) {
+    $token_exists = $this->moduleHandler->moduleExists('token');
+    if ($token_exists) {
       $form['fset_account']['fset_email_verification_template']['hybridauth_token_tree'] = [
         '#theme' => 'token_tree',
         '#token_types' => [
@@ -181,7 +181,7 @@ class HybridauthAdminSettings extends ConfigFormBase {
       '#title' => $this->t('Display name pattern'),
       '#default_value' => $values['hybridauth_display_name'],
     ];
-    if ($module_exist_token) {
+    if ($token_exists) {
       $form['fset_account']['fset_token'] = [
         '#type' => 'fieldset',
         '#title' => $this->t('Tokens'),
@@ -213,7 +213,6 @@ class HybridauthAdminSettings extends ConfigFormBase {
       '#type' => 'checkbox',
       '#title' => $this->t('Override Real name'),
       '#default_value' => $values['hybridauth_override_realname'],
-      '#disabled' => !$this->moduleHandler->moduleExists('realname'),
     ];
     $form['fset_account']['hybridauth_disable_username_change'] = [
       '#type' => 'checkbox',
@@ -244,7 +243,7 @@ class HybridauthAdminSettings extends ConfigFormBase {
       '#title' => $this->t('Redirect after error on login'),
       '#default_value' => $values['hybridauth_destination_error'],
     ];
-    if ($module_exist_token) {
+    if ($token_exists) {
       $form['fset_other']['fset_token'] = [
         '#type' => 'fieldset',
         '#title' => $this->t('Tokens'),
@@ -260,15 +259,14 @@ class HybridauthAdminSettings extends ConfigFormBase {
         '#dialog' => TRUE,
       ];
     }
-    $options = [
-      0 => $this->t('Allow duplicate email addresses, create new user account and login'),
-      1 => $this->t("Don't allow duplicate email addresses, block registration and advise to login using the existing account"),
-      2 => $this->t("Don't allow duplicate email addresses, add new identity to the existing account and login"),
-    ];
     $form['fset_other']['hybridauth_duplicate_emails'] = [
       '#type' => 'radios',
       '#title' => $this->t('Duplicate emails'),
-      '#options' => $options,
+      '#options' => [
+        0 => $this->t('Allow duplicate email addresses, create new user account and login'),
+        1 => $this->t("Don't allow duplicate email addresses, block registration and advise to login using the existing account"),
+        2 => $this->t("Don't allow duplicate email addresses, add new identity to the existing account and login"),
+      ],
       '#default_value' => $values['hybridauth_duplicate_emails'],
     ];
     $form['fset_other']['hybridauth_proxy'] = [
