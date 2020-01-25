@@ -1,6 +1,17 @@
-hybridauth.callback:
+hybridauth.endpoint:
   path: /hybridauth/callback
   defaults:
-    _controller: '\Drupal\hybridauth\Controller\CallbackController::callback'
+    _controller: '\Drupal\hybridauth\Controller\HybridAuthController::endpoint'
   requirements:
     _permission: 'use hybridauth'
+  options:
+    no_cache: TRUE
+
+hybridauth.authenticate:
+  path: '/hybridauth/authenticate/{provider_id}'
+  defaults:
+    _controller: '\Drupal\hybridauth\Controller\HybridAuthController::authenticate'
+  requirements:
+    _permission: 'use hybridauth'
+  options:
+    no_cache: TRUE
