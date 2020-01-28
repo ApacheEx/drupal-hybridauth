@@ -1,6 +1,7 @@
 name: HybridAuth
 description: Provides HybridAuth social sign-on.
 package: HybridAuth
-
+dependencies:
+  - fontawesome:fontawesome
 type: module
 core: 8.x
