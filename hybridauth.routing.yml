@@ -15,3 +15,11 @@ hybridauth.authenticate:
     _permission: 'use hybridauth'
   options:
     no_cache: TRUE
+
+hybridauth.settings:
+  path: '/admin/config/people/hybridauth'
+  defaults:
+    _form: '\Drupal\hybridauth\Form\HybridauthAdminSettings'
+    _title: 'HybridAuth'
+  requirements:
+    _permission: 'administer site configuration'

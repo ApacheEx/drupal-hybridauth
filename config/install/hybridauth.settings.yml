@@ -1,0 +1,29 @@
+hybridauth_settings:
+  vtabs__active_tab: edit-fset-fields
+  hybridauth_required_fields:
+    email: 0
+    firstName: 0
+    lastName: 0
+    gender: 0
+  hybridauth_register: '1'
+  hybridauth_email_verification: '1'
+  hybridauth_email_verification_subject: ''
+  hybridauth_email_verification_body: ''
+  hybridauth_pictures: 0
+  hybridauth_username: user
+  hybridauth_display_name: ''
+  hybridauth_registration_username_change: 0
+  hybridauth_registration_password: 0
+  hybridauth_override_realname: 0
+  hybridauth_disable_username_change: 0
+  hybridauth_remove_password_fields: 0
+  hybridauth_destination: ''
+  hybridauth_destination_error: ''
+  hybridauth_duplicate_emails: '0'
+  hybridauth_proxy: ''
+  hybridauth_debug: 0
+  submit: 'Save configuration'
+  form_build_id: form-NkOjblchd2cKajaafLFafeWWfQ6uSJOwAxWCw7kOiHo
+  form_token: aENdXO99LtOiOJIb7ZzkQB25_kOIKKlEpPXpr2QAyIs
+  form_id: hybridauth_admin_settings
+  op: 'Save configuration'
