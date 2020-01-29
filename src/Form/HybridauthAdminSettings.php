@@ -6,6 +6,8 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Link;
+use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -82,6 +84,86 @@ class HybridauthAdminSettings extends ConfigFormBase {
       '#type' => 'vertical_tabs',
       '#title' => $this->t('Hybrid Auth Settings'),
     ];
+
+    // Authentication providers.
+    // - set tab.
+    $form['fset_providers'] = [
+      '#type' => 'details',
+      '#title' => $this->t('Authentication providers'),
+      '#group' => 'vtabs',
+    ];
+
+    // - set content of tab.
+    // Header of table.
+    $header = [
+      'name' => t('Name'),
+//      'icon' => t('Icon'),
+      'available' => t('Available'),
+      'settings' => t('Settings'),
+    ];
+    $options = [];
+    $weight = -50;
+    // Clear the providers cache here to get any new ones.
+    $providers = hybridauth_providers_list(TRUE);
+    // @todo need to check.
+    $enabled_providers = array_filter(\Drupal::state()->get('hybridauth_providers', []));
+    $available_providers = hybridauth_providers_files();
+    $form['fset_providers']['hybridauth_providers'] = [];
+
+    // We have no icon pack in new hybridauth library.
+    // $icon_pack = variable_get('hybridauth_widget_icon_pack', 'hybridauth_32');
+//    $icon_pack = 'hybridauth_16';
+//    _hybridauth_add_icon_pack_files($icon_pack, $form);
+    foreach (array_keys($enabled_providers + $providers) as $provider_id) {
+      $available = array_key_exists($provider_id, $available_providers);
+      $link = Link::fromTextAndUrl(
+        $this->t('Settings'),
+        Url::fromRoute(
+          'hybridauth.providers.settings',
+          ['provider_id' => $provider_id],
+          ['query' => $this->getDestinationArray()]
+        )
+      )->toString();
+      $options[$provider_id] = [
+        'name' => $providers[$provider_id],
+//        'icon' => theme('hybridauth_provider_icon', array('icon_pack' => $icon_pack, 'provider_id' => $provider_id, 'provider_name' => $providers[$provider_id])),
+        'available' => $available ? t('Yes') : t('No'),
+        'settings' => $link,
+        '#attributes' => [
+          'class' => [
+            'draggable'
+          ]
+        ],
+      ];
+      $form['fset_providers']['hybridauth_providers']['hybridauth_provider_' . $provider_id . '_weight'] = [
+        '#tree' => FALSE,
+        '#type' => 'weight',
+        '#delta' => 50,
+        '#default_value' => $weight++,
+        '#attributes' => array('class' => array('hybridauth-providers-weight')),
+      ];
+    }
+    $form['fset_providers']['hybridauth_providers'] += [
+      '#type' => 'tableselect',
+      '#title' => $this->t('Providers'),
+      '#header' => $header,
+      '#options' => $options,
+      '#default_value' => $enabled_providers,
+      '#tabledrag' => [
+        [
+          'action' => 'order',
+          'relationship' => 'sibling',
+          'group' => 'hybridauth-providers-weight',
+        ],
+      ],
+//      '#pre_render' => ['hybridauth_admin_providers_pre_render'],
+    ];
+
+
+
+
+
+    // Required information
     $form['fset_fields'] = [
       '#type' => 'details',
       '#title' => $this->t('Required information'),

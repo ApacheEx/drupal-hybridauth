@@ -154,15 +154,47 @@ class HybridAuthController extends ControllerBase {
    * Gets providers configuration.
    */
   protected function getConfiguration() {
+//    // @todo add admin pages and get key & secret from config.
+//    // @todo it works with Linkedin only now - need to make more flexible.
+//    return [
+//      'callback' => $this->getEndpointPath(),
+//      'keys' => [
+//        'key' => "78gn83265vv7rk", // 78gn83265vv7rk
+//        'secret' => "158FD3kIv5YCIeLb", // 158FD3kIv5YCIeLb
+//      ]
+//    ];
+
+    // Get provider ID.
+    $provider_id = $this->request->attributes->get('provider_id');
+
+    // Get callback.
+    $callback = $this->getEndpointPath();
+
+    // Get parameters from configuration storage.
+    $config = $this->config('hybridauth.providers.settings');
+    $values = $config->get('hybridauth_providers_settings');
+
+//    switch ($provider_id) {
+//      case 'linkedin':
+        $key = $values['hybridauth_provider_LinkedIn_keys_key'];
+        $secret = $values['hybridauth_provider_LinkedIn_keys_secret'];
+//        break;
+
+//      default:
+//        $key = $values['hybridauth_provider_LinkedIn_keys_key'];
+//        $secret = $values['hybridauth_provider_LinkedIn_keys_secret'];
+//    }
+
     // @todo add admin pages and get key & secret from config.
     // @todo it works with Linkedin only now - need to make more flexible.
     return [
-      'callback' => $this->getEndpointPath(),
+      'callback' => $callback,
       'keys' => [
-        'key' => 'Your Linked API key here',
-        'secret' => 'Your Linkedin secret here',
+          'key' => $key,
+          'secret' => $secret,
       ]
     ];
+
   }
 
 }

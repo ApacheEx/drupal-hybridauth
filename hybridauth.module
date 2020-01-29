@@ -17,3 +17,207 @@ function hybridauth_form_alter(&$form, FormStateInterface $form_state, $form_id)
   }
 
 }
+
+/**
+ * Returns auth provider name by provider ID.
+ */
+function hybridauth_get_provider_name($provider_id) {
+  $providers = hybridauth_providers_list();
+  return isset($providers[$provider_id]) ? $providers[$provider_id] : NULL;
+}
+
+/**
+ * Internal functions.
+ */
+function hybridauth_providers_list($reset = FALSE) {
+  $providers = &drupal_static(__FUNCTION__, NULL);
+
+  if (!isset($providers)) {
+    $raw_providers = [
+      // Core providers.
+      'AOL' => t('AOL'),
+      'Facebook' => t('Facebook'),
+      'Foursquare' => t('Foursquare'),
+      'Google' => t('Google'),
+      'LinkedIn' => t('LinkedIn'),
+      'Live' => t('Windows Live'),
+      'MySpace' => t('MySpace'),
+      'OpenID' => t('OpenID'),
+      'Twitter' => t('Twitter'),
+      'Yahoo' => t('Yahoo'),
+      // Additional providers.
+      'px500' => t('500px'),
+      'Disqus' => t('Disqus'),
+      'FamilySearch' => t('FamilySearch'),
+      'Geni' => t('Geni'),
+      'GitHub' => t('GitHub'),
+      'Goodreads' => t('Goodreads'),
+      'HumanitarianId' => t('Humanitarian ID'),
+      'Identica' => t('Identica'),
+      'Instagram' => t('Instagram'),
+      'LastFM' => t('LastFM'),
+      'Mailru' => t('Mail.ru'),
+      'Murmur' => t('Murmur'),
+      'MyHeritage' => t('MyHeritage'),
+      'Odnoklassniki' => t('Odnoklassniki'),
+      'Pixnet' => t('Pixnet'),
+      'Plurk' => t('Plurk'),
+      'QQ' => t('QQ'),
+      'Sina' => t('Sina'),
+      'Skyrock' => t('Skyrock'),
+      'Steam' => t('Steam'),
+      'Tumblr' => t('Tumblr'),
+      'TwitchTV' => t('Twitch.tv'),
+      'Viadeo' => t('Viadeo'),
+      'Vimeo' => t('Vimeo'),
+      'Vkontakte' => t('VKontakte'),
+      'Yandex' => t('Yandex'),
+    ];
+    foreach (hybridauth_providers_files($reset) as $name => $file) {
+      if (!array_key_exists($name, $raw_providers)) {
+        $raw_providers[$name] = t($name);
+      }
+    }
+
+    $providers = array();
+    $enabled_providers = array_filter(\Drupal::state()->get('hybridauth_providers', []));
+    foreach (array_keys($enabled_providers + $raw_providers) as $provider_id) {
+      $providers[$provider_id] = $raw_providers[$provider_id];
+    }
+  }
+
+  return $providers;
+}
+
+/**
+ * Returns available providers files, keyed by filename without extension.
+ */
+function hybridauth_providers_files($reset = FALSE) {
+  $files = array();
+  // Try to get cached value if allowed: $reset == FALSE.
+  if (!$reset) {
+    $cache = \Drupal::cache()->get('hybridauth_providers_files');
+//    $cache = cache_get('hybridauth_providers_files');
+    if (!empty($cache->data)) {
+      $files = $cache->data;
+    }
+  }
+
+  // Scan Providers directory if $reset == TRUE or there was no cached value.
+  if (empty($files)) {
+    $files = \Drupal::service('file_system')
+      ->scanDirectory(
+        _hybridauth_library_path() . '/hybridauth/src/Provider',
+        '/\.php$/',
+        ['key' => 'name']
+      );
+    \Drupal::cache()->set('hybridauth_providers_files', $files);
+  }
+  return $files;
+}
+
+/**
+ * Returns the path to the HybridAuth library.
+ */
+function _hybridauth_library_path() {
+  $library_path = &drupal_static(__FUNCTION__, NULL);
+
+  if (!isset($library_path)) {
+    // Check if the variable is set.
+    $library_path = \Drupal::state()->get('hybridauth_library_path', '');
+
+    if (empty($library_path)) {
+      // Use libraries module or profile directory, fallback to standard directory.
+      if (\Drupal::moduleHandler()->moduleExists('libraries')) {
+        // @todo Need check this case.
+        $library_path = libraries_get_libraries(['libraries']);
+      }
+      else {
+        $profile = drupal_get_path('profile', \Drupal::installProfile());
+        $library_path = $profile . '/libraries/hybridauth';
+        if (!file_exists($library_path)) {
+          $library_path = '../vendor/hybridauth';
+        }
+      }
+    }
+    if (file_exists($library_path . '/hybridauth/src/Hybridauth.php')) {
+    }
+    // @todo Check this condition.
+    elseif (file_exists($library_path . '/hybridauth/src/Hybridauth.php')) {
+      $library_path .= '/hybridauth';
+    }
+    else {
+      \Drupal::logger('hybridauth')->notice('HybridAuth library is missing.', []);
+      $library_path = FALSE;
+    }
+  }
+
+  return $library_path;
+}
+
+/**
+ * Pre-render callback for the providers tableselect.
+ */
+function hybridauth_admin_providers_pre_render($element) {
+  // Add weight column.
+  $element['#header']['weight'] = t('Weight');
+  foreach (array_keys($element['#options']) as $provider_id) {
+    $key = 'hybridauth_provider_' . $provider_id . '_weight';
+    $element['#options'][$provider_id]['weight'] = array(
+      'data' => \Drupal::service('renderer')->render($element[$key]),
+    );
+    unset($element[$key]);
+  }
+
+  // Assign id to the table.
+  $table_id = 'hybridauth-providers';
+  $element['#attributes'] = ['id' => $table_id];
+//  drupal_add_tabledrag($table_id, 'order', 'sibling', 'hybridauth-providers-weight');
+//  drupal_attach_tabledrag(
+//    $table_id,
+//    [
+//      'action' => 'order',
+//      'relationship' => 'sibling',
+//      'group' => 'hybridauth-providers-weight',
+//    ]
+//  );
+  return $element;
+}
+
+//
+///**
+// * Load metadata for a single provider without loading all providers.
+// */
+//function hybridauth_get_provider($name) {
+//  ctools_include('plugins');
+//  return ctools_get_plugins('hybridauth', 'provider', $name);
+//}
+
+///**
+// * Load metadata for a single icon pack without loading all icon packs.
+// */
+//function hybridauth_get_icon_pack($name) {
+//  ctools_include('plugins');
+//  return ctools_get_plugins('hybridauth', 'icon_pack', $name);
+//}
+//
+///**
+// * @param $name
+// * @param $element
+// */
+//function _hybridauth_add_icon_pack_files($name, &$element) {
+//  $done = &drupal_static(__FUNCTION__, NULL);
+//  if (!isset($done[$name])) {
+//    $done[$name] = TRUE;
+//    $icon_pack = hybridauth_get_icon_pack($name);
+//    foreach (array('css', 'js') as $key) {
+//      if (!empty($icon_pack[$key])) {
+//        $element['#attached'][$key][] = $icon_pack['path'] . '/' . $icon_pack[$key];
+//      }
+//    }
+//    if ($function = ctools_plugin_get_function($icon_pack, 'initialize_callback')) {
+//      $function($element);
+//    }
+//  }
+//}
+
