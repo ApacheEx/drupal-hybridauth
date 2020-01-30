@@ -79,7 +79,7 @@ class HybridAuthController extends ControllerBase {
     session_start();
 
     try {
-      $provider = new LinkedIn($this->getConfiguration());
+      $provider = new LinkedIn($this->getConfiguration($provider_id));
 
       $session = $this->request->getSession();
 
@@ -98,7 +98,7 @@ class HybridAuthController extends ControllerBase {
    */
   public function endpoint() {
     try {
-      $provider = new LinkedIn($this->getConfiguration());
+      $provider = new LinkedIn($this->getConfiguration('linkedin'));
       $provider->authenticate();
       $account = $this->authenticateUser($provider->getUserProfile());
       return $this->redirect('entity.user.canonical', ['user' => $account->id()]);
@@ -152,38 +152,32 @@ class HybridAuthController extends ControllerBase {
 
   /**
    * Gets providers configuration.
+   *
+   * @param string $provider_id
+   *
+   * @return array
    */
-  protected function getConfiguration() {
-//    // @todo add admin pages and get key & secret from config.
-//    // @todo it works with Linkedin only now - need to make more flexible.
-//    return [
-//      'callback' => $this->getEndpointPath(),
-//      'keys' => [
-//        'key' => "78gn83265vv7rk", // 78gn83265vv7rk
-//        'secret' => "158FD3kIv5YCIeLb", // 158FD3kIv5YCIeLb
-//      ]
-//    ];
-
-    // Get provider ID.
-    $provider_id = $this->request->attributes->get('provider_id');
-
+  protected function getConfiguration($provider_id = '') {
     // Get callback.
     $callback = $this->getEndpointPath();
 
     // Get parameters from configuration storage.
     $config = $this->config('hybridauth.providers.settings');
-    $values = $config->get('hybridauth_providers_settings');
 
-//    switch ($provider_id) {
-//      case 'linkedin':
-        $key = $values['hybridauth_provider_LinkedIn_keys_key'];
-        $secret = $values['hybridauth_provider_LinkedIn_keys_secret'];
-//        break;
+    switch ($provider_id) {
+      case 'linkedin':
+        $key = $config->get(
+          'hybridauth_providers_settings_' . $provider_id . '_key'
+        );
+        $secret = $config->get(
+          'hybridauth_providers_settings_' . $provider_id . '_secret'
+        );
+        break;
 
-//      default:
-//        $key = $values['hybridauth_provider_LinkedIn_keys_key'];
-//        $secret = $values['hybridauth_provider_LinkedIn_keys_secret'];
-//    }
+      default:
+        $key = '';
+        $secret = '';
+    }
 
     // @todo add admin pages and get key & secret from config.
     // @todo it works with Linkedin only now - need to make more flexible.

@@ -140,7 +140,11 @@ class HybridauthAdminSettings extends ConfigFormBase {
         '#type' => 'weight',
         '#delta' => 50,
         '#default_value' => $weight++,
-        '#attributes' => array('class' => array('hybridauth-providers-weight')),
+        '#attributes' => [
+          'class' => [
+            'hybridauth-providers-weight'
+          ]
+        ],
       ];
     }
     $form['fset_providers']['hybridauth_providers'] += [

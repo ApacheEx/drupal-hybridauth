@@ -55,9 +55,26 @@ class HybridauthProviderSettings extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $config = $this->config('hybridauth.providers.settings');
-    $config->set('hybridauth_providers_settings', $form_state->getValues());
-    $config->save();
+    // Get id of provider from the form.
+    $provider_id = $form['#attributes']['provider_id'];
+
+    // Get values from form.
+    $values = $form_state->getValues();
+
+    switch ($provider_id) {
+      case 'linkedin':
+        $config = $this->config('hybridauth.providers.settings');
+        $config->set(
+          'hybridauth_providers_settings_' . $provider_id . '_key',
+          $values['hybridauth_provider_linkedin_key']
+        );
+        $config->set(
+          'hybridauth_providers_settings_' . $provider_id . '_secret',
+          $values['hybridauth_provider_linkedin_secret']
+        );
+        $config->save();
+        break;
+    }
 
     parent::submitForm($form, $form_state);
   }
@@ -75,16 +92,26 @@ class HybridauthProviderSettings extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state, $provider_id = '') {
+    // Make id of provider in lower case
+    // because in Controller used id in lower case.
+    $provider_id = strtolower($provider_id);
+
+    // Get provider configuration.
     $config = $this->config('hybridauth.providers.settings');
     $values = $config->get('hybridauth_providers_settings');
 
+    // Set the tab.
     $form['vtabs'] = [
       '#type' => 'vertical_tabs',
       '#title' => $this->t($provider_id),
     ];
 
+    // Set the provider_id to the attributes of a form.
+    $form['#attributes']['provider_id'] = $provider_id;
+
     switch ($provider_id) {
-      case 'LinkedIn':
+      case 'linkedin':
+        // Add a tab.
         $form['application'] = [
           '#type' => 'details',
           '#title' => $this->t('Application settings'),
@@ -92,99 +119,21 @@ class HybridauthProviderSettings extends ConfigFormBase {
           '#group' => 'vtabs',
         ];
 
-        $form['application']['hybridauth_provider_' . $provider_id . '_keys_key'] = array(
+        // Add key field.
+        $form['application']['hybridauth_provider_' . $provider_id . '_key'] = array(
           '#type' => 'textfield',
           '#title' => t('Client ID'),
-          '#default_value' => $values['hybridauth_provider_' . $provider_id . '_keys_key'],
+          '#default_value' => $values['hybridauth_provider_' . $provider_id . '_key'],
         );
 
-        $form['application']['hybridauth_provider_' . $provider_id . '_keys_secret'] = array(
+        // Add secret field.
+        $form['application']['hybridauth_provider_' . $provider_id . '_secret'] = array(
           '#type' => 'textfield',
           '#title' => t('Client Secret.'),
-          '#default_value' => $values['hybridauth_provider_' . $provider_id . '_keys_secret'],
+          '#default_value' => $values['hybridauth_provider_' . $provider_id . '_secret'],
         );
-
-//        $app_settings['#description'] = t('Enter the Client ID and Client Secret.');
-//        $app_settings['hybridauth_provider_' . $provider_id . '_keys_key']['#title'] = t('Client ID');
-//        unset($app_settings['hybridauth_provider_' . $provider_id . '_keys_key']['#description']);
-//        $app_settings['hybridauth_provider_' . $provider_id . '_keys_secret']['#title'] = t('Client Secret');
-//        unset($app_settings['hybridauth_provider_' . $provider_id . '_keys_secret']['#description']);
-//        unset($app_settings['hybridauth_provider_' . $provider_id . '_keys_id']);
-
         break;
     }
-
-
-
-
-//    $form['application']['hybridauth_provider_' . $provider_id . '_keys_id'] = array(
-//      '#type' => 'textfield',
-//      '#title' => t('Application ID'),
-//      '#description' => t('The application ID.'),
-//      '#default_value' => \Drupal::state()->get('hybridauth_provider_' . $provider_id . '_keys_id', ''),
-//    );
-
-//
-//    $form['window_settings'] = [
-//      '#type' => 'details',
-//      '#title' => $this->t('Authentication window settings'),
-//      '#group' => 'vtabs',
-//    ];
-//    $options = array(
-//      'current' => t('Current window'),
-//      'popup' => t('New popup window'),
-//    );
-//    $modal_description = FALSE;
-//    if (\Drupal::moduleHandler()->moduleExists('colorbox')) {
-//      $options['colorbox'] = t('Colorbox');
-//      $modal_description = TRUE;
-//    }
-//    if (\Drupal::moduleHandler()->moduleExists('shadowbox')) {
-//      $options['shadowbox'] = t('Shadowbox');
-//      $modal_description = TRUE;
-//    }
-//    if (\Drupal::moduleHandler()->moduleExists('fancybox')) {
-//      $options['fancybox'] = t('fancyBox');
-//      $modal_description = TRUE;
-//    }
-//    if (\Drupal::moduleHandler()->moduleExists('lightbox2')) {
-//      $options['lightbox2'] = t('Lightbox2');
-//      $modal_description = TRUE;
-//    }
-//    $form['window_settings']['hybridauth_provider_' . $provider_id . '_window_type'] = array(
-//      '#type' => 'radios',
-//      '#title' => t('Authentication window type'),
-//      '#options' => $options,
-//      '#default_value' => \Drupal::state()->get('hybridauth_provider_' . $provider_id . '_window_type', 'current'),
-//      '#description' => $modal_description ? t("Be careful with modal windows - some authentication providers (Twitter, LinkedIn) won't work with them.") : '',
-//    );
-//    $base = array(
-//      '#type' => 'textfield',
-//      '#element_validate' => array('element_validate_integer_positive'),
-//      '#size' => 4,
-//      '#maxlength' => 4,
-//      '#states' => array(
-//        'invisible' => array(
-//          ':input[name="hybridauth_provider_' . $provider_id . '_window_type"]' => array('value' => 'current'),
-//        ),
-//      ),
-//    );
-//    $form['window_settings']['hybridauth_provider_' . $provider_id . '_window_width'] = array(
-//        '#title' => t('Width'),
-//        '#description' => t('Authentication window width (pixels).'),
-//        '#default_value' => \Drupal::state()->get('hybridauth_provider_' . $provider_id . '_window_width', 800),
-//      ) + $base;
-//    $form['window_settings']['hybridauth_provider_' . $provider_id . '_window_height'] = array(
-//        '#title' => t('Height'),
-//        '#description' => t('Authentication window height (pixels).'),
-//        '#default_value' => \Drupal::state()->get('hybridauth_provider_' . $provider_id . '_window_height', 500),
-//      ) + $base;
-
-//    if ($provider = hybridauth_get_provider($provider_id)) {
-//      if ($function = ctools_plugin_get_function($provider, 'configuration_form_callback')) {
-//        $function($form, $provider_id);
-//      }
-//    }
 
     return parent::buildForm($form, $form_state);
   }
