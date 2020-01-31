@@ -105,8 +105,7 @@ class HybridauthAdminSettings extends ConfigFormBase {
     $weight = -50;
     // Clear the providers cache here to get any new ones.
     $providers = hybridauth_providers_list(TRUE);
-    // @todo need to check.
-    $enabled_providers = array_filter(\Drupal::state()->get('hybridauth_providers', []));
+    $enabled_providers = $values['hybridauth_providers'];
     $available_providers = hybridauth_providers_files();
     $form['fset_providers']['hybridauth_providers'] = [];
 

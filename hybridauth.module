@@ -115,7 +115,6 @@ function hybridauth_providers_files($reset = FALSE) {
   // Try to get cached value if allowed: $reset == FALSE.
   if (!$reset) {
     $cache = \Drupal::cache()->get('hybridauth_providers_files');
-//    $cache = cache_get('hybridauth_providers_files');
     if (!empty($cache->data)) {
       $files = $cache->data;
     }

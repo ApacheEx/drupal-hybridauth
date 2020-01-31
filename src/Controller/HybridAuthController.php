@@ -9,7 +9,6 @@ namespace Drupal\hybridauth\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Routing\UrlGeneratorInterface;
-use Drupal\plugin_test_extended\Plugin\plugin_test\fruit\BigApple;
 use Drupal\user\UserStorageInterface;
 use Hybridauth\Provider\BitBucket;
 use Hybridauth\Provider\Facebook;
@@ -94,7 +93,6 @@ class HybridAuthController extends ControllerBase {
           $provider = new Google($this->getConfiguration($provider_id));
           break;
         case 'bitbucket':
-          $t = $this->getConfiguration($provider_id);
           $provider = new BitBucket($this->getConfiguration($provider_id));
           break;
       }
@@ -180,6 +178,8 @@ class HybridAuthController extends ControllerBase {
     // Get callback.
     $callback = $this->getEndpointPath();
 
+    // @todo add admin pages and get key & secret from config.
+    // @todo it works with Linkedin only now - need to make more flexible.
     // Get parameters from configuration storage.
     $config = $this->config('hybridauth.providers.settings');
 
@@ -199,8 +199,6 @@ class HybridAuthController extends ControllerBase {
 //        $secret = '';
 //    }
 
-    // @todo add admin pages and get key & secret from config.
-    // @todo it works with Linkedin only now - need to make more flexible.
     return [
       'callback' => $callback,
       'keys' => [
