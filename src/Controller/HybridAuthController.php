@@ -10,11 +10,6 @@ namespace Drupal\hybridauth\Controller;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Routing\UrlGeneratorInterface;
 use Drupal\user\UserStorageInterface;
-use Hybridauth\Provider\BitBucket;
-use Hybridauth\Provider\Facebook;
-use Hybridauth\Provider\Google;
-use Hybridauth\Provider\LinkedIn;
-use Hybridauth\Provider\Yahoo;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -80,6 +75,7 @@ class HybridAuthController extends ControllerBase {
   public function authenticate($provider_id) {
     // Make sure the session is started, HybridAuth library needs it.
     // @todo find the way how to avoid session_start().
+    // https://symfony.com/doc/current/components/http_foundation/sessions.html ?
     session_start();
 
     try {
@@ -105,11 +101,20 @@ class HybridAuthController extends ControllerBase {
    */
   public function endpoint() {
     try {
-      // @todo Need add other social networks? The call back is the same for most (all?) services.
-      $provider = new LinkedIn($this->getConfiguration('linkedin'));
+      $session = $this->request->getSession();
+
+      // Saving provider id in session for further usage.
+      $provider_id = $session->get('hybridauth_provider');
+      // Configure function name and path for it.
+      $provider_function = 'Hybridauth\\Provider\\' . $provider_id;
+      // Get provider by variable function.
+      $provider = new $provider_function($this->getConfiguration($provider_id));
+
       $provider->authenticate();
       $account = $this->authenticateUser($provider->getUserProfile());
-      return $this->redirect('entity.user.canonical', ['user' => $account->id()]);
+      return $this->redirect(
+        'entity.user.canonical', ['user' => $account->id()]
+      );
     }
     catch (\Exception $e) {
       echo 'Oops, we ran into an issue! ' . $e->getMessage();
@@ -155,7 +160,9 @@ class HybridAuthController extends ControllerBase {
    * Callback path for HybridAuth.
    */
   protected function getEndpointPath() {
-    return $this->urlGenerator->generateFromRoute('hybridauth.endpoint', [], ['absolute' => TRUE]);
+    return $this->urlGenerator->generateFromRoute(
+        'hybridauth.endpoint', [], ['absolute' => TRUE]
+    );
   }
 
   /**
