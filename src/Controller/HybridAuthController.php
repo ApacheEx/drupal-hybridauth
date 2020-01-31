@@ -14,6 +14,7 @@ use Hybridauth\Provider\BitBucket;
 use Hybridauth\Provider\Facebook;
 use Hybridauth\Provider\Google;
 use Hybridauth\Provider\LinkedIn;
+use Hybridauth\Provider\Yahoo;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -94,6 +95,9 @@ class HybridAuthController extends ControllerBase {
           break;
         case 'bitbucket':
           $provider = new BitBucket($this->getConfiguration($provider_id));
+          break;
+        case 'yahoo':
+          $provider = new Yahoo($this->getConfiguration($provider_id));
           break;
       }
 

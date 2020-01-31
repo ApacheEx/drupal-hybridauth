@@ -32,6 +32,12 @@ function hybridauth_form_alter(&$form, FormStateInterface $form_state, $form_id)
       '#type' => 'link',
       '#url' => Url::fromRoute('hybridauth.authenticate', ['provider_id' => 'bitbucket']),
     ];
+
+    $form['hybridauth_yahoo'] = [
+      '#title' => t('Log in with Yahoo'),
+      '#type' => 'link',
+      '#url' => Url::fromRoute('hybridauth.authenticate', ['provider_id' => 'yahoo']),
+    ];
   }
 
 }
