@@ -12,31 +12,31 @@ function hybridauth_form_alter(&$form, FormStateInterface $form_state, $form_id)
     $form['hybridauth'] = [
       '#title' => t('Log in with Linkedin'),
       '#type' => 'link',
-      '#url' => Url::fromRoute('hybridauth.authenticate', ['provider_id' => 'linkedin']),
+      '#url' => Url::fromRoute('hybridauth.authenticate', ['provider_id' => 'LinkedIn']),
     ];
 
     $form['hybridauth_facebook'] = [
       '#title' => t('Log in with Facebook'),
       '#type' => 'link',
-      '#url' => Url::fromRoute('hybridauth.authenticate', ['provider_id' => 'facebook']),
+      '#url' => Url::fromRoute('hybridauth.authenticate', ['provider_id' => 'Facebook']),
     ];
 
     $form['hybridauth_google'] = [
       '#title' => t('Log in with Google'),
       '#type' => 'link',
-      '#url' => Url::fromRoute('hybridauth.authenticate', ['provider_id' => 'google']),
+      '#url' => Url::fromRoute('hybridauth.authenticate', ['provider_id' => 'Google']),
     ];
 
     $form['hybridauth_bitbucket'] = [
       '#title' => t('Log in with BitBucket'),
       '#type' => 'link',
-      '#url' => Url::fromRoute('hybridauth.authenticate', ['provider_id' => 'bitbucket']),
+      '#url' => Url::fromRoute('hybridauth.authenticate', ['provider_id' => 'BitBucket']),
     ];
 
     $form['hybridauth_yahoo'] = [
       '#title' => t('Log in with Yahoo'),
       '#type' => 'link',
-      '#url' => Url::fromRoute('hybridauth.authenticate', ['provider_id' => 'yahoo']),
+      '#url' => Url::fromRoute('hybridauth.authenticate', ['provider_id' => 'Yahoo']),
     ];
   }
 

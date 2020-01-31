@@ -96,10 +96,6 @@ class HybridauthProviderSettings extends ConfigFormBase {
       '#title' => $this->t($provider_id),
     ];
 
-    // Make id of provider in lower case
-    // because in Controller used id in lower case.
-    $provider_id = strtolower($provider_id);
-
     // Get provider configuration.
     $config = $this->config('hybridauth.providers.settings');
 

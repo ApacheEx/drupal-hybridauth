@@ -83,23 +83,10 @@ class HybridAuthController extends ControllerBase {
     session_start();
 
     try {
-      switch ($provider_id) {
-        case 'linkedin':
-          $provider = new LinkedIn($this->getConfiguration($provider_id));
-          break;
-        case 'facebook':
-          $provider = new Facebook($this->getConfiguration($provider_id));
-          break;
-        case 'google':
-          $provider = new Google($this->getConfiguration($provider_id));
-          break;
-        case 'bitbucket':
-          $provider = new BitBucket($this->getConfiguration($provider_id));
-          break;
-        case 'yahoo':
-          $provider = new Yahoo($this->getConfiguration($provider_id));
-          break;
-      }
+      // Configure function name and path for it.
+      $provider_function = 'Hybridauth\\Provider\\' . $provider_id;
+      // Get provider from variable function.
+      $provider = new $provider_function($this->getConfiguration($provider_id));
 
       $session = $this->request->getSession();
 
@@ -118,7 +105,7 @@ class HybridAuthController extends ControllerBase {
    */
   public function endpoint() {
     try {
-      // @todo Need add other social networks?
+      // @todo Need add other social networks? The call back is the same for most (all?) services.
       $provider = new LinkedIn($this->getConfiguration('linkedin'));
       $provider->authenticate();
       $account = $this->authenticateUser($provider->getUserProfile());
@@ -182,26 +169,14 @@ class HybridAuthController extends ControllerBase {
     // Get callback.
     $callback = $this->getEndpointPath();
 
-    // @todo add admin pages and get key & secret from config.
-    // @todo it works with Linkedin only now - need to make more flexible.
     // Get parameters from configuration storage.
     $config = $this->config('hybridauth.providers.settings');
-
-//    switch ($provider_id) {
-//      case 'linkedin':
-
-        $key = $config->get(
-          'hybridauth_providers_settings_' . $provider_id . '_key'
-        );
-        $secret = $config->get(
-          'hybridauth_providers_settings_' . $provider_id . '_secret'
-        );
-//        break;
-//
-//      default:
-//        $key = '';
-//        $secret = '';
-//    }
+    $key = $config->get(
+      'hybridauth_providers_settings_' . $provider_id . '_key'
+    );
+    $secret = $config->get(
+      'hybridauth_providers_settings_' . $provider_id . '_secret'
+    );
 
     return [
       'callback' => $callback,
