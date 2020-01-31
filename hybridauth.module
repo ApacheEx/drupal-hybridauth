@@ -14,6 +14,24 @@ function hybridauth_form_alter(&$form, FormStateInterface $form_state, $form_id)
       '#type' => 'link',
       '#url' => Url::fromRoute('hybridauth.authenticate', ['provider_id' => 'linkedin']),
     ];
+
+    $form['hybridauth_facebook'] = [
+      '#title' => t('Log in with Facebook'),
+      '#type' => 'link',
+      '#url' => Url::fromRoute('hybridauth.authenticate', ['provider_id' => 'facebook']),
+    ];
+
+    $form['hybridauth_google'] = [
+      '#title' => t('Log in with Google'),
+      '#type' => 'link',
+      '#url' => Url::fromRoute('hybridauth.authenticate', ['provider_id' => 'google']),
+    ];
+
+    $form['hybridauth_bitbucket'] = [
+      '#title' => t('Log in with BitBucket'),
+      '#type' => 'link',
+      '#url' => Url::fromRoute('hybridauth.authenticate', ['provider_id' => 'bitbucket']),
+    ];
   }
 
 }
