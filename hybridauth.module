@@ -9,35 +9,24 @@ use Drupal\Core\Url;
 function hybridauth_form_alter(&$form, FormStateInterface $form_state, $form_id) {
   // @todo remove this later and use block or widget or whatever.
   if ($form_id == 'user_login_form') {
-    $form['hybridauth'] = [
-      '#title' => t('Log in with Linkedin'),
-      '#type' => 'link',
-      '#url' => Url::fromRoute('hybridauth.authenticate', ['provider_id' => 'LinkedIn']),
-    ];
-
-    $form['hybridauth_facebook'] = [
-      '#title' => t('Log in with Facebook'),
-      '#type' => 'link',
-      '#url' => Url::fromRoute('hybridauth.authenticate', ['provider_id' => 'Facebook']),
-    ];
-
-    $form['hybridauth_google'] = [
-      '#title' => t('Log in with Google'),
-      '#type' => 'link',
-      '#url' => Url::fromRoute('hybridauth.authenticate', ['provider_id' => 'Google']),
-    ];
-
-    $form['hybridauth_bitbucket'] = [
-      '#title' => t('Log in with BitBucket'),
-      '#type' => 'link',
-      '#url' => Url::fromRoute('hybridauth.authenticate', ['provider_id' => 'BitBucket']),
-    ];
-
-    $form['hybridauth_yahoo'] = [
-      '#title' => t('Log in with Yahoo'),
-      '#type' => 'link',
-      '#url' => Url::fromRoute('hybridauth.authenticate', ['provider_id' => 'Yahoo']),
-    ];
+    // Get settings from configs
+    $values =
+      \Drupal::config('hybridauth.settings')->get('hybridauth_settings');
+    // Get enabled providers.
+    $enabled_providers = $values['hybridauth_providers'];
+    // Generate elements of forms for enabled providers.
+    foreach ($enabled_providers as $name => $value) {
+      if (!empty($value)) {
+        $form['hybridauth_' . $name] = [
+          '#title' => t('Log in with @name', ['@name' => $name]),
+          '#type' => 'link',
+          '#url' => Url::fromRoute(
+            'hybridauth.authenticate',
+            ['provider_id' => $name]
+          ),
+        ];
+      }
+    }
   }
 
 }
