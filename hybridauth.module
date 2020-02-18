@@ -1,34 +1,21 @@
 <?php
 
-use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Url;
-
 /**
- * Implements hook_form_alter().
+ * Implements hook_theme().
+ *
+ * Hook for use templates for hybridauth block.
  */
-function hybridauth_form_alter(&$form, FormStateInterface $form_state, $form_id) {
-  // @todo remove this later and use block or widget or whatever.
-  if ($form_id == 'user_login_form') {
-    // Get settings from configs
-    $values =
-      \Drupal::config('hybridauth.settings')->get('hybridauth_settings');
-    // Get enabled providers.
-    $enabled_providers = $values['hybridauth_providers'];
-    // Generate elements of forms for enabled providers.
-    foreach ($enabled_providers as $name => $value) {
-      if (!empty($value)) {
-        $form['hybridauth_' . $name] = [
-          '#title' => t('Log in with @name', ['@name' => $name]),
-          '#type' => 'link',
-          '#url' => Url::fromRoute(
-            'hybridauth.authenticate',
-            ['provider_id' => $name]
-          ),
-        ];
-      }
-    }
-  }
-
+function hybridauth_theme() {
+  return [
+    'hybridauth_block_display' => [
+      'variables' => [
+        'markup' => NULL,
+        'providers' => [],
+        'title' => NULL,
+      ],
+      'template' => 'hybridauth-block-display',
+    ],
+  ];
 }
 
 /**
