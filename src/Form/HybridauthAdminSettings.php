@@ -97,7 +97,6 @@ class HybridauthAdminSettings extends ConfigFormBase {
     // Header of table.
     $header = [
       'name' => t('Name'),
-//      'icon' => t('Icon'),
       'available' => t('Available'),
       'settings' => t('Settings'),
     ];
@@ -109,10 +108,6 @@ class HybridauthAdminSettings extends ConfigFormBase {
     $available_providers = hybridauth_providers_files();
     $form['fset_providers']['hybridauth_providers'] = [];
 
-    // We have no icon pack in new hybridauth library.
-    // $icon_pack = variable_get('hybridauth_widget_icon_pack', 'hybridauth_32');
-//    $icon_pack = 'hybridauth_16';
-//    _hybridauth_add_icon_pack_files($icon_pack, $form);
     foreach (array_keys($enabled_providers + $providers) as $provider_id) {
       $available = array_key_exists($provider_id, $available_providers);
       $link = Link::fromTextAndUrl(
@@ -125,7 +120,6 @@ class HybridauthAdminSettings extends ConfigFormBase {
       )->toString();
       $options[$provider_id] = [
         'name' => $providers[$provider_id],
-//        'icon' => theme('hybridauth_provider_icon', array('icon_pack' => $icon_pack, 'provider_id' => $provider_id, 'provider_name' => $providers[$provider_id])),
         'available' => $available ? t('Yes') : t('No'),
         'settings' => $link,
         '#attributes' => [
@@ -159,7 +153,6 @@ class HybridauthAdminSettings extends ConfigFormBase {
           'group' => 'hybridauth-providers-weight',
         ],
       ],
-//      '#pre_render' => ['hybridauth_admin_providers_pre_render'],
     ];
 
 

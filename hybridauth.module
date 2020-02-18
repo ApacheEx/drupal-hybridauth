@@ -195,52 +195,6 @@ function hybridauth_admin_providers_pre_render($element) {
   // Assign id to the table.
   $table_id = 'hybridauth-providers';
   $element['#attributes'] = ['id' => $table_id];
-//  drupal_add_tabledrag($table_id, 'order', 'sibling', 'hybridauth-providers-weight');
-//  drupal_attach_tabledrag(
-//    $table_id,
-//    [
-//      'action' => 'order',
-//      'relationship' => 'sibling',
-//      'group' => 'hybridauth-providers-weight',
-//    ]
-//  );
+
   return $element;
 }
-
-//
-///**
-// * Load metadata for a single provider without loading all providers.
-// */
-//function hybridauth_get_provider($name) {
-//  ctools_include('plugins');
-//  return ctools_get_plugins('hybridauth', 'provider', $name);
-//}
-
-///**
-// * Load metadata for a single icon pack without loading all icon packs.
-// */
-//function hybridauth_get_icon_pack($name) {
-//  ctools_include('plugins');
-//  return ctools_get_plugins('hybridauth', 'icon_pack', $name);
-//}
-//
-///**
-// * @param $name
-// * @param $element
-// */
-//function _hybridauth_add_icon_pack_files($name, &$element) {
-//  $done = &drupal_static(__FUNCTION__, NULL);
-//  if (!isset($done[$name])) {
-//    $done[$name] = TRUE;
-//    $icon_pack = hybridauth_get_icon_pack($name);
-//    foreach (array('css', 'js') as $key) {
-//      if (!empty($icon_pack[$key])) {
-//        $element['#attached'][$key][] = $icon_pack['path'] . '/' . $icon_pack[$key];
-//      }
-//    }
-//    if ($function = ctools_plugin_get_function($icon_pack, 'initialize_callback')) {
-//      $function($element);
-//    }
-//  }
-//}
-
