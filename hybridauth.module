@@ -58,8 +58,9 @@ function hybridauth_providers_list($reset = FALSE) {
       }
     }
 
-    $providers = array();
-    $enabled_providers = array_filter(\Drupal::state()->get('hybridauth_providers', []));
+    $providers = [];
+    $enabled_providers = array_filter(\Drupal::state()
+      ->get('hybridauth_providers', []));
     foreach (array_keys($enabled_providers + $raw_providers) as $provider_id) {
       $providers[$provider_id] = $raw_providers[$provider_id];
     }
@@ -72,7 +73,7 @@ function hybridauth_providers_list($reset = FALSE) {
  * Returns available providers files, keyed by filename without extension.
  */
 function hybridauth_providers_files($reset = FALSE) {
-  $files = array();
+  $files = [];
   // Try to get cached value if allowed: $reset == FALSE.
   if (!$reset) {
     $cache = \Drupal::cache()->get('hybridauth_providers_files');
@@ -83,54 +84,31 @@ function hybridauth_providers_files($reset = FALSE) {
 
   // Scan Providers directory if $reset == TRUE or there was no cached value.
   if (empty($files)) {
+    // Get base dir of site.
+    $basepath = getcwd();
+    // Get location ov vendor directory.
+    if (!is_dir($basepath . '/vendor/')) {
+      $basepath_in_array = explode('/',$basepath);
+      $basepath = implode(
+        '/',
+        array_slice(
+          $basepath_in_array,
+          0,
+          count($basepath_in_array) - 1
+        )
+      );
+    }
+    $vendor_path = $basepath . '/vendor';
+
     $files = \Drupal::service('file_system')
       ->scanDirectory(
-        _hybridauth_library_path() . '/hybridauth/src/Provider',
+        $vendor_path . '/hybridauth/hybridauth/src/Provider',
         '/\.php$/',
         ['key' => 'name']
       );
     \Drupal::cache()->set('hybridauth_providers_files', $files);
   }
   return $files;
-}
-
-/**
- * Returns the path to the HybridAuth library.
- */
-function _hybridauth_library_path() {
-  $library_path = &drupal_static(__FUNCTION__, NULL);
-
-  if (!isset($library_path)) {
-    // Check if the variable is set.
-    $library_path = \Drupal::state()->get('hybridauth_library_path', '');
-
-    if (empty($library_path)) {
-      // Use libraries module or profile directory, fallback to standard directory.
-      if (\Drupal::moduleHandler()->moduleExists('libraries')) {
-        // @todo Need check this case.
-        $library_path = libraries_get_libraries(['libraries']);
-      }
-      else {
-        $profile = drupal_get_path('profile', \Drupal::installProfile());
-        $library_path = $profile . '/libraries/hybridauth';
-        if (!file_exists($library_path)) {
-          $library_path = '../vendor/hybridauth';
-        }
-      }
-    }
-    if (file_exists($library_path . '/hybridauth/src/Hybridauth.php')) {
-    }
-    // @todo Check this condition.
-    elseif (file_exists($library_path . '/hybridauth/src/Hybridauth.php')) {
-      $library_path .= '/hybridauth';
-    }
-    else {
-      \Drupal::logger('hybridauth')->notice('HybridAuth library is missing.', []);
-      $library_path = FALSE;
-    }
-  }
-
-  return $library_path;
 }
 
 /**
@@ -141,9 +119,9 @@ function hybridauth_admin_providers_pre_render($element) {
   $element['#header']['weight'] = t('Weight');
   foreach (array_keys($element['#options']) as $provider_id) {
     $key = 'hybridauth_provider_' . $provider_id . '_weight';
-    $element['#options'][$provider_id]['weight'] = array(
+    $element['#options'][$provider_id]['weight'] = [
       'data' => \Drupal::service('renderer')->render($element[$key]),
-    );
+    ];
     unset($element[$key]);
   }
 
