@@ -110,35 +110,37 @@ class HybridauthAdminSettings extends ConfigFormBase {
 
     foreach (array_keys($enabled_providers + $providers) as $provider_id) {
       $available = array_key_exists($provider_id, $available_providers);
-      $link = Link::fromTextAndUrl(
-        $this->t('Settings'),
-        Url::fromRoute(
-          'hybridauth.provider.settings',
-          ['provider_id' => $provider_id],
-          ['query' => $this->getDestinationArray()]
-        )
-      )->toString();
-      $options[$provider_id] = [
-        'name' => $providers[$provider_id],
-        'available' => $available ? t('Yes') : t('No'),
-        'settings' => $link,
-        '#attributes' => [
-          'class' => [
-            'draggable'
-          ]
-        ],
-      ];
-      $form['fset_providers']['hybridauth_providers']['hybridauth_provider_' . $provider_id . '_weight'] = [
-        '#tree' => FALSE,
-        '#type' => 'weight',
-        '#delta' => 50,
-        '#default_value' => $weight++,
-        '#attributes' => [
-          'class' => [
-            'hybridauth-providers-weight'
-          ]
-        ],
-      ];
+      if ($available) {
+        $link = Link::fromTextAndUrl(
+          $this->t('Settings'),
+          Url::fromRoute(
+            'hybridauth.provider.settings',
+            ['provider_id' => $provider_id],
+            ['query' => $this->getDestinationArray()]
+          )
+        )->toString();
+        $options[$provider_id] = [
+          'name' => $providers[$provider_id],
+          'available' => $available ? t('Yes') : t('No'),
+          'settings' => $link,
+          '#attributes' => [
+            'class' => [
+              'draggable'
+            ]
+          ],
+        ];
+        $form['fset_providers']['hybridauth_providers']['hybridauth_provider_' . $provider_id . '_weight'] = [
+          '#tree' => FALSE,
+          '#type' => 'weight',
+          '#delta' => 50,
+          '#default_value' => $weight++,
+          '#attributes' => [
+            'class' => [
+              'hybridauth-providers-weight'
+            ]
+          ],
+        ];
+      }
     }
     $form['fset_providers']['hybridauth_providers'] += [
       '#type' => 'tableselect',
