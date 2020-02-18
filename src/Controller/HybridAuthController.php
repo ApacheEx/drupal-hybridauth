@@ -82,7 +82,12 @@ class HybridAuthController extends ControllerBase {
       // Configure function name and path for it.
       $provider_function = 'Hybridauth\\Provider\\' . $provider_id;
       // Get provider from variable function.
-      $provider = new $provider_function($this->getConfiguration($provider_id));
+      if (class_exists($provider_function)) {
+        $provider = new $provider_function($this->getConfiguration($provider_id));
+      }
+      else {
+        return false;
+      }
 
       $session = $this->request->getSession();
 
@@ -103,12 +108,17 @@ class HybridAuthController extends ControllerBase {
     try {
       $session = $this->request->getSession();
 
-      // Saving provider id in session for further usage.
+      // Get provider id from session.
       $provider_id = $session->get('hybridauth_provider');
       // Configure function name and path for it.
       $provider_function = 'Hybridauth\\Provider\\' . $provider_id;
       // Get provider by variable function.
-      $provider = new $provider_function($this->getConfiguration($provider_id));
+      if (class_exists($provider_function)) {
+        $provider = new $provider_function($this->getConfiguration($provider_id));
+      }
+      else {
+        return false;
+      }
 
       $provider->authenticate();
       $account = $this->authenticateUser($provider->getUserProfile());
