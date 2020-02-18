@@ -118,7 +118,7 @@ class HybridauthAdminSettings extends ConfigFormBase {
       $link = Link::fromTextAndUrl(
         $this->t('Settings'),
         Url::fromRoute(
-          'hybridauth.providers.settings',
+          'hybridauth.provider.settings',
           ['provider_id' => $provider_id],
           ['query' => $this->getDestinationArray()]
         )

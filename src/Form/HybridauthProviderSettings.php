@@ -61,7 +61,7 @@ class HybridauthProviderSettings extends ConfigFormBase {
     // Get values from form.
     $values = $form_state->getUserInput();
 
-    $config = $this->config('hybridauth.providers.settings');
+    $config = $this->config('hybridauth.provider.settings');
 
     $config->set(
       'hybridauth_providers_settings_' . $provider_id . '_key',
@@ -82,7 +82,7 @@ class HybridauthProviderSettings extends ConfigFormBase {
    */
   protected function getEditableConfigNames() {
     return [
-      'hybridauth.providers.settings',
+      'hybridauth.provider.settings',
     ];
   }
 
@@ -97,7 +97,7 @@ class HybridauthProviderSettings extends ConfigFormBase {
     ];
 
     // Get provider configuration.
-    $config = $this->config('hybridauth.providers.settings');
+    $config = $this->config('hybridauth.provider.settings');
 
     // Set the provider_id to the attributes of a form.
     $form['#attributes']['provider_id'] = $provider_id;

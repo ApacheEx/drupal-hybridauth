@@ -24,7 +24,7 @@ hybridauth.settings:
   requirements:
     _permission: 'administer site configuration'
 
-hybridauth.providers.settings:
+hybridauth.provider.settings:
   path: 'admin/config/people/hybridauth/provider/{provider_id}'
   defaults:
     _form: '\Drupal\hybridauth\Form\HybridauthProviderSettings'

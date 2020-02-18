@@ -177,7 +177,7 @@ class HybridAuthController extends ControllerBase {
     $callback = $this->getEndpointPath();
 
     // Get parameters from configuration storage.
-    $config = $this->config('hybridauth.providers.settings');
+    $config = $this->config('hybridauth.provider.settings');
     $key = $config->get(
       'hybridauth_providers_settings_' . $provider_id . '_key'
     );
