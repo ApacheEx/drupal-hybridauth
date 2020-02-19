@@ -9,6 +9,7 @@ namespace Drupal\hybridauth\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Routing\UrlGeneratorInterface;
+use Drupal\hybridauth\Provider\HybridauthProvider;
 use Drupal\user\UserStorageInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -40,6 +41,13 @@ class HybridAuthController extends ControllerBase {
   protected $request;
 
   /**
+   * The current Request object.
+   *
+   * @var \Drupal\hybridauth\Provider\HybridauthProvider
+   */
+  protected $providerService;
+
+  /**
    * Constructs HybridAuthController.
    *
    * @param \Drupal\Core\Routing\UrlGeneratorInterface $url_generator
@@ -48,11 +56,13 @@ class HybridAuthController extends ControllerBase {
    *   The user storage.
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   The current request.
+   * @param \Drupal\hybridauth\Provider\HybridauthProvider $provider_service
    */
-  public function __construct(UrlGeneratorInterface $url_generator, UserStorageInterface $user_storage, Request $request) {
+  public function __construct(UrlGeneratorInterface $url_generator, UserStorageInterface $user_storage, Request $request, HybridauthProvider $provider_service) {
     $this->urlGenerator = $url_generator;
     $this->userStorage = $user_storage;
     $this->request = $request;
+    $this->providerService = $provider_service;
   }
 
   /**
@@ -62,7 +72,8 @@ class HybridAuthController extends ControllerBase {
     return new static(
       $container->get('url_generator'),
       $container->get('entity_type.manager')->getStorage('user'),
-      $container->get('request_stack')->getCurrentRequest()
+      $container->get('request_stack')->getCurrentRequest(),
+      $container->get('hybridauth.get_provider_conf')
     );
   }
 
@@ -83,7 +94,9 @@ class HybridAuthController extends ControllerBase {
       $provider_function = 'Hybridauth\\Provider\\' . $provider_id;
       // Get provider from variable function.
       if (class_exists($provider_function)) {
-        $provider = new $provider_function($this->getConfiguration($provider_id));
+        $provider_config =
+          $this->providerService->getConfiguration($provider_id);
+        $provider = new $provider_function($provider_config);
       }
       else {
         return false;
@@ -114,7 +127,9 @@ class HybridAuthController extends ControllerBase {
       $provider_function = 'Hybridauth\\Provider\\' . $provider_id;
       // Get provider by variable function.
       if (class_exists($provider_function)) {
-        $provider = new $provider_function($this->getConfiguration($provider_id));
+        $provider_config =
+          $this->providerService->getConfiguration($provider_id);
+        $provider = new $provider_function($provider_config);
       }
       else {
         return false;
@@ -164,45 +179,6 @@ class HybridAuthController extends ControllerBase {
     user_login_finalize($account);
 
     return $account;
-  }
-
-  /**
-   * Callback path for HybridAuth.
-   */
-  protected function getEndpointPath() {
-    return $this->urlGenerator->generateFromRoute(
-        'hybridauth.endpoint', [], ['absolute' => TRUE]
-    );
-  }
-
-  /**
-   * Gets providers configuration.
-   *
-   * @param string $provider_id
-   *
-   * @return array
-   */
-  protected function getConfiguration($provider_id = '') {
-    // Get callback.
-    $callback = $this->getEndpointPath();
-
-    // Get parameters from configuration storage.
-    $config = $this->config('hybridauth.provider.settings');
-    $key = $config->get(
-      'hybridauth_providers_settings_' . $provider_id . '_key'
-    );
-    $secret = $config->get(
-      'hybridauth_providers_settings_' . $provider_id . '_secret'
-    );
-
-    return [
-      'callback' => $callback,
-      'keys' => [
-          'key' => $key,
-          'secret' => $secret,
-      ]
-    ];
-
   }
 
 }

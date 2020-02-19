@@ -101,7 +101,6 @@ class HybridauthAdminSettings extends ConfigFormBase {
       'settings' => t('Settings'),
     ];
     $options = [];
-    $weight = -50;
     // Clear the providers cache here to get any new ones.
     $providers = hybridauth_providers_list(TRUE);
     $enabled_providers = $values['hybridauth_providers'];

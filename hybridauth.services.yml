@@ -1,0 +1,4 @@
+services:
+  hybridauth.get_provider_conf:
+    class: Drupal\hybridauth\Provider\HybridauthProvider
+    arguments: ['@url_generator']
