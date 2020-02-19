@@ -136,6 +136,7 @@ class HybridauthAdminSettings extends ConfigFormBase {
       '#header' => $header,
       '#options' => $options,
       '#default_value' => $enabled_providers,
+      '#js_select' => FALSE,
       '#tabledrag' => [
         [
           'action' => 'order',
