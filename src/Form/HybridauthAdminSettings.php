@@ -145,10 +145,6 @@ class HybridauthAdminSettings extends ConfigFormBase {
       ],
     ];
 
-
-
-
-
     // Required information
     $form['fset_fields'] = [
       '#type' => 'details',

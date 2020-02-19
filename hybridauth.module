@@ -60,21 +60,13 @@ function hybridauth_providers_files($reset = FALSE) {
 
   // Scan Providers directory if $reset == TRUE or there was no cached value.
   if (empty($files)) {
-    // Get base dir of site.
-    $basepath = getcwd();
-    // Get location ov vendor directory.
-    if (!is_dir($basepath . '/vendor/')) {
-      $basepath_in_array = explode('/',$basepath);
-      $basepath = implode(
-        '/',
-        array_slice(
-          $basepath_in_array,
-          0,
-          count($basepath_in_array) - 1
-        )
-      );
+    // Get location of vendor directory.
+    if (is_dir(DRUPAL_ROOT . '/vendor/')) {
+      $vendor_path = DRUPAL_ROOT . '/vendor';
     }
-    $vendor_path = $basepath . '/vendor';
+    else {
+      $vendor_path = DRUPAL_ROOT . '/../vendor';
+    }
 
     $files = \Drupal::service('file_system')
       ->scanDirectory(
