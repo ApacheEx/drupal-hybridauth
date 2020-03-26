@@ -19,18 +19,16 @@ function hybridauth_theme() {
 }
 
 /**
- * Internal functions.
+ * Returns list of providers from hybridauth library.
  */
 function hybridauth_providers_list($reset = FALSE) {
   $providers = &drupal_static(__FUNCTION__, NULL);
-
-  $test = hybridauth_providers_files($reset);
 
   if (!isset($providers)) {
     $raw_providers = [];
     foreach (hybridauth_providers_files($reset) as $name => $file) {
       if (!array_key_exists($name, $raw_providers)) {
-        $raw_providers[$name] = t($name);
+        $raw_providers[$name] = $name;
       }
     }
 
