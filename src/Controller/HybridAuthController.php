@@ -8,6 +8,7 @@
 namespace Drupal\hybridauth\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Routing\UrlGeneratorInterface;
 use Drupal\hybridauth\Provider\HybridauthProvider;
 use Drupal\user\UserStorageInterface;
@@ -57,12 +58,18 @@ class HybridAuthController extends ControllerBase {
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   The current request.
    * @param \Drupal\hybridauth\Provider\HybridauthProvider $provider_service
+   *   The handler of module.
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    */
-  public function __construct(UrlGeneratorInterface $url_generator, UserStorageInterface $user_storage, Request $request, HybridauthProvider $provider_service) {
+  public function __construct(UrlGeneratorInterface $url_generator, UserStorageInterface $user_storage, Request $request, HybridauthProvider $provider_service, ModuleHandlerInterface $module_handler) {
     $this->urlGenerator = $url_generator;
     $this->userStorage = $user_storage;
     $this->request = $request;
     $this->providerService = $provider_service;
+
+    // Connect to the Hybridauth library.
+    $module_path = $module_handler->getModule('hybridauth')->getPath();
+    require $module_path . '/vendor/autoload.php';
   }
 
   /**
@@ -73,7 +80,8 @@ class HybridAuthController extends ControllerBase {
       $container->get('url_generator'),
       $container->get('entity_type.manager')->getStorage('user'),
       $container->get('request_stack')->getCurrentRequest(),
-      $container->get('hybridauth.get_provider_conf')
+      $container->get('hybridauth.get_provider_conf'),
+      $container->get('module_handler')
     );
   }
 

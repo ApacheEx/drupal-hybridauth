@@ -98,7 +98,7 @@ class HybridauthAdminSettings extends ConfigFormBase {
     $header = [
       'name' => t('Name'),
       'available' => t('Available'),
-      'settings' => t('Settings'),
+      'settings' => t('Settings'),providers_form
     ];
     $options = [];
     // Clear the providers cache here to get any new ones.

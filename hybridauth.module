@@ -60,17 +60,12 @@ function hybridauth_providers_files($reset = FALSE) {
 
   // Scan Providers directory if $reset == TRUE or there was no cached value.
   if (empty($files)) {
-    // Get location of vendor directory.
-    if (is_dir(DRUPAL_ROOT . '/vendor/')) {
-      $vendor_path = DRUPAL_ROOT . '/vendor';
-    }
-    else {
-      $vendor_path = DRUPAL_ROOT . '/../vendor';
-    }
-
+    // Get location of vendor directory in the module folder.
+    $module_handler = \Drupal::service('module_handler');
+    $module_path = $module_handler->getModule('hybridauth')->getPath();
     $files = \Drupal::service('file_system')
       ->scanDirectory(
-        $vendor_path . '/hybridauth/hybridauth/src/Provider',
+        $module_path . '/vendor/hybridauth/hybridauth/src/Provider',
         '/\.php$/',
         ['key' => 'name']
       );
