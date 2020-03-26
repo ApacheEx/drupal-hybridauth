@@ -107,7 +107,12 @@ class HybridauthAdminSettings extends ConfigFormBase {
     $available_providers = hybridauth_providers_files();
     $form['fset_providers']['hybridauth_providers'] = [];
 
-    foreach (array_keys($enabled_providers + $providers) as $provider_id) {
+    $providers_array = $providers;
+    if (!empty($enabled_providers)) {
+      $providers_array = $enabled_providers + $providers;
+    }
+
+    foreach (array_keys($providers_array) as $provider_id) {
       $available = array_key_exists($provider_id, $available_providers);
       if ($available) {
         $link = Link::fromTextAndUrl(
