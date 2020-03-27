@@ -90,6 +90,8 @@ class HybridAuthController extends ControllerBase {
    *
    * @param string $provider_id
    *   Authentication provider.
+   *
+   * @return bool
    */
   public function authenticate($provider_id) {
     // Make sure the session is started, HybridAuth library needs it.
@@ -98,15 +100,9 @@ class HybridAuthController extends ControllerBase {
     session_start();
 
     try {
-      // Configure function name and path for it.
-      $provider_function = 'Hybridauth\\Provider\\' . $provider_id;
-      // Get provider from variable function.
-      if (class_exists($provider_function)) {
-        $provider_config =
-          $this->providerService->getConfiguration($provider_id);
-        $provider = new $provider_function($provider_config);
-      }
-      else {
+      // Get instance of the provider.
+      $provider = $this->providerService->getInstance($provider_id);
+      if ($provider === false) {
         return false;
       }
 
@@ -131,15 +127,10 @@ class HybridAuthController extends ControllerBase {
 
       // Get provider id from session.
       $provider_id = $session->get('hybridauth_provider');
-      // Configure function name and path for it.
-      $provider_function = 'Hybridauth\\Provider\\' . $provider_id;
-      // Get provider by variable function.
-      if (class_exists($provider_function)) {
-        $provider_config =
-          $this->providerService->getConfiguration($provider_id);
-        $provider = new $provider_function($provider_config);
-      }
-      else {
+
+      // Get instance of the provider.
+      $provider = $this->providerService->getInstance($provider_id);
+      if ($provider === false) {
         return false;
       }
 

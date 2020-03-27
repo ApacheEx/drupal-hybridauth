@@ -73,4 +73,26 @@ class HybridauthProvider extends ControllerBase {
     ];
   }
 
+  /**
+   * Gets Instance of the provider.
+   *
+   * @param string $provider_id
+   *
+   * @return bool
+   */
+  public function getInstance($provider_id = '') {
+    // Configure function name and path for it.
+    $provider_function = 'Hybridauth\\Provider\\' . $provider_id;
+
+    // Get provider from variable function.
+    if (class_exists($provider_function)) {
+      $provider_config =
+        $this->getConfiguration($provider_id);
+      return new $provider_function($provider_config);
+    }
+    else {
+      return false;
+    }
+  }
+
 }
