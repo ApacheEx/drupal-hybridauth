@@ -80,7 +80,7 @@ class HybridAuthController extends ControllerBase {
       $container->get('url_generator'),
       $container->get('entity_type.manager')->getStorage('user'),
       $container->get('request_stack')->getCurrentRequest(),
-      $container->get('hybridauth.get_provider_conf'),
+      $container->get('hybridauth.provider'),
       $container->get('module_handler')
     );
   }
