@@ -8,9 +8,10 @@
 namespace Drupal\hybridauth\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Routing\UrlGeneratorInterface;
+use Drupal\hybridauth\Provider\HybridauthProvider;
 use Drupal\user\UserStorageInterface;
-use Hybridauth\Provider\LinkedIn;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -41,6 +42,13 @@ class HybridAuthController extends ControllerBase {
   protected $request;
 
   /**
+   * The current Request object.
+   *
+   * @var \Drupal\hybridauth\Provider\HybridauthProvider
+   */
+  protected $providerService;
+
+  /**
    * Constructs HybridAuthController.
    *
    * @param \Drupal\Core\Routing\UrlGeneratorInterface $url_generator
@@ -49,11 +57,19 @@ class HybridAuthController extends ControllerBase {
    *   The user storage.
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   The current request.
+   * @param \Drupal\hybridauth\Provider\HybridauthProvider $provider_service
+   *   The handler of module.
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    */
-  public function __construct(UrlGeneratorInterface $url_generator, UserStorageInterface $user_storage, Request $request) {
+  public function __construct(UrlGeneratorInterface $url_generator, UserStorageInterface $user_storage, Request $request, HybridauthProvider $provider_service, ModuleHandlerInterface $module_handler) {
     $this->urlGenerator = $url_generator;
     $this->userStorage = $user_storage;
     $this->request = $request;
+    $this->providerService = $provider_service;
+
+    // Connect to the Hybridauth library.
+    $module_path = $module_handler->getModule('hybridauth')->getPath();
+    require $module_path . '/vendor/autoload.php';
   }
 
   /**
@@ -63,7 +79,9 @@ class HybridAuthController extends ControllerBase {
     return new static(
       $container->get('url_generator'),
       $container->get('entity_type.manager')->getStorage('user'),
-      $container->get('request_stack')->getCurrentRequest()
+      $container->get('request_stack')->getCurrentRequest(),
+      $container->get('hybridauth.provider'),
+      $container->get('module_handler')
     );
   }
 
@@ -72,14 +90,21 @@ class HybridAuthController extends ControllerBase {
    *
    * @param string $provider_id
    *   Authentication provider.
+   *
+   * @return bool
    */
   public function authenticate($provider_id) {
     // Make sure the session is started, HybridAuth library needs it.
     // @todo find the way how to avoid session_start().
+    // https://symfony.com/doc/current/components/http_foundation/sessions.html ?
     session_start();
 
     try {
-      $provider = new LinkedIn($this->getConfiguration());
+      // Get instance of the provider.
+      $provider = $this->providerService->getInstance($provider_id);
+      if ($provider === false) {
+        return false;
+      }
 
       $session = $this->request->getSession();
 
@@ -98,10 +123,22 @@ class HybridAuthController extends ControllerBase {
    */
   public function endpoint() {
     try {
-      $provider = new LinkedIn($this->getConfiguration());
+      $session = $this->request->getSession();
+
+      // Get provider id from session.
+      $provider_id = $session->get('hybridauth_provider');
+
+      // Get instance of the provider.
+      $provider = $this->providerService->getInstance($provider_id);
+      if ($provider === false) {
+        return false;
+      }
+
       $provider->authenticate();
       $account = $this->authenticateUser($provider->getUserProfile());
-      return $this->redirect('entity.user.canonical', ['user' => $account->id()]);
+      return $this->redirect(
+        'entity.user.canonical', ['user' => $account->id()]
+      );
     }
     catch (\Exception $e) {
       echo 'Oops, we ran into an issue! ' . $e->getMessage();
@@ -141,28 +178,6 @@ class HybridAuthController extends ControllerBase {
     user_login_finalize($account);
 
     return $account;
-  }
-
-  /**
-   * Callback path for HybridAuth.
-   */
-  protected function getEndpointPath() {
-    return $this->urlGenerator->generateFromRoute('hybridauth.endpoint', [], ['absolute' => TRUE]);
-  }
-
-  /**
-   * Gets providers configuration.
-   */
-  protected function getConfiguration() {
-    // @todo add admin pages and get key & secret from config.
-    // @todo it works with Linkedin only now - need to make more flexible.
-    return [
-      'callback' => $this->getEndpointPath(),
-      'keys' => [
-        'key' => 'Your Linked API key here',
-        'secret' => 'Your Linkedin secret here',
-      ]
-    ];
   }
 
 }

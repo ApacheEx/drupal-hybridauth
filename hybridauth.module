@@ -1,19 +1,94 @@
 <?php
 
-use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Url;
+/**
+ * Implements hook_theme().
+ *
+ * Hook for use templates for hybridauth block.
+ */
+function hybridauth_theme() {
+  return [
+    'hybridauth_block_display' => [
+      'variables' => [
+        'markup' => NULL,
+        'providers' => [],
+        'title' => NULL,
+      ],
+      'template' => 'hybridauth-block-display',
+    ],
+  ];
+}
 
 /**
- * Implements hook_form_alter().
+ * Returns list of providers from hybridauth library.
  */
-function hybridauth_form_alter(&$form, FormStateInterface $form_state, $form_id) {
-  // @todo remove this later and use block or widget or whatever.
-  if ($form_id == 'user_login_form') {
-    $form['hybridauth'] = [
-      '#title' => t('Log in with Linkedin'),
-      '#type' => 'link',
-      '#url' => Url::fromRoute('hybridauth.authenticate', ['provider_id' => 'linkedin']),
-    ];
+function hybridauth_providers_list($reset = FALSE) {
+  $providers = &drupal_static(__FUNCTION__, NULL);
+
+  if (!isset($providers)) {
+    $raw_providers = [];
+    foreach (hybridauth_providers_files($reset) as $name => $file) {
+      if (!array_key_exists($name, $raw_providers)) {
+        $raw_providers[$name] = $name;
+      }
+    }
+
+    $providers = [];
+    $enabled_providers = array_filter(\Drupal::state()
+      ->get('hybridauth_providers', []));
+    foreach (array_keys($enabled_providers + $raw_providers) as $provider_id) {
+      $providers[$provider_id] = $raw_providers[$provider_id];
+    }
   }
 
+  return $providers;
+}
+
+/**
+ * Returns available providers files, keyed by filename without extension.
+ */
+function hybridauth_providers_files($reset = FALSE) {
+  $files = [];
+  // Try to get cached value if allowed: $reset == FALSE.
+  if (!$reset) {
+    $cache = \Drupal::cache()->get('hybridauth_providers_files');
+    if (!empty($cache->data)) {
+      $files = $cache->data;
+    }
+  }
+
+  // Scan Providers directory if $reset == TRUE or there was no cached value.
+  if (empty($files)) {
+    // Get location of vendor directory in the module folder.
+    $module_handler = \Drupal::service('module_handler');
+    $module_path = $module_handler->getModule('hybridauth')->getPath();
+    $files = \Drupal::service('file_system')
+      ->scanDirectory(
+        $module_path . '/vendor/hybridauth/hybridauth/src/Provider',
+        '/\.php$/',
+        ['key' => 'name']
+      );
+    \Drupal::cache()->set('hybridauth_providers_files', $files);
+  }
+  return $files;
+}
+
+/**
+ * Pre-render callback for the providers tableselect.
+ */
+function hybridauth_admin_providers_pre_render($element) {
+  // Add weight column.
+  $element['#header']['weight'] = t('Weight');
+  foreach (array_keys($element['#options']) as $provider_id) {
+    $key = 'hybridauth_provider_' . $provider_id . '_weight';
+    $element['#options'][$provider_id]['weight'] = [
+      'data' => \Drupal::service('renderer')->render($element[$key]),
+    ];
+    unset($element[$key]);
+  }
+
+  // Assign id to the table.
+  $table_id = 'hybridauth-providers';
+  $element['#attributes'] = ['id' => $table_id];
+
+  return $element;
 }

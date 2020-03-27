@@ -6,6 +6,8 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Link;
+use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -82,6 +84,74 @@ class HybridauthAdminSettings extends ConfigFormBase {
       '#type' => 'vertical_tabs',
       '#title' => $this->t('Hybrid Auth Settings'),
     ];
+
+    // Authentication providers.
+    // - set tab.
+    $form['fset_providers'] = [
+      '#type' => 'details',
+      '#title' => $this->t('Authentication providers'),
+      '#group' => 'vtabs',
+    ];
+
+    // - set content of tab.
+    // Header of table.
+    $header = [
+      'name' => t('Name'),
+      'available' => t('Available'),
+      'settings' => t('Settings'),
+    ];
+    $options = [];
+    // Clear the providers cache here to get any new ones.
+    $providers = hybridauth_providers_list(TRUE);
+    $enabled_providers = $values['hybridauth_providers'];
+    $available_providers = hybridauth_providers_files();
+    $form['fset_providers']['hybridauth_providers'] = [];
+
+    $providers_array = $providers;
+    if (!empty($enabled_providers)) {
+      $providers_array = $enabled_providers + $providers;
+    }
+
+    foreach (array_keys($providers_array) as $provider_id) {
+      $available = array_key_exists($provider_id, $available_providers);
+      if ($available) {
+        $link = Link::fromTextAndUrl(
+          $this->t('Settings'),
+          Url::fromRoute(
+            'hybridauth.provider.settings',
+            ['provider_id' => $provider_id],
+            ['query' => $this->getDestinationArray()]
+          )
+        )->toString();
+        $options[$provider_id] = [
+          'name' => $providers[$provider_id],
+          'available' => $available ? t('Yes') : t('No'),
+          'settings' => $link,
+          '#attributes' => [
+            'class' => [
+              'draggable'
+            ]
+          ],
+        ];
+      }
+    }
+    $form['fset_providers']['hybridauth_providers'] += [
+      '#type' => 'tableselect',
+      '#title' => $this->t('Providers'),
+      '#header' => $header,
+      '#options' => $options,
+      '#default_value' => $enabled_providers,
+      '#js_select' => FALSE,
+      '#tabledrag' => [
+        [
+          'action' => 'order',
+          'relationship' => 'sibling',
+          'group' => 'hybridauth-providers-weight',
+        ],
+      ],
+    ];
+
+    // Required information
     $form['fset_fields'] = [
       '#type' => 'details',
       '#title' => $this->t('Required information'),

@@ -1,0 +1,16 @@
+{#
+/**
+ * @file
+ * Theme implementation for hybridauth custom module.
+ */
+#}
+
+{% if providers != NULL %}
+  <div class="login-block">
+    <ul class="providers-list">
+      {% for key, item in providers %}
+        <li><a href="{{ item }}">{{ key }}</a></li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endif %}
